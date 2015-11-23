@@ -70,7 +70,16 @@ exports.joinHandler = function joinHandler(command) {
              + 'command: `' + command.command + '`\n'
              + 'args: `' + command.args + '`\n'
              + 'mention: `' + command.mention + '`\n'
-             + 'post:\n[quote]\n' + command.post + '\n[/quote]';
+             + 'post:\n[quote]\n' + command.post.cleaned + '\n[/quote]';
+    internals.browser.createPost(command.post.topic_id, command.post.post_number, text, () => 0);
+};
+
+exports.voteHandler = function voteHandler(command) {
+    const text = '@' + command.post.username + ' voted for ' + command.args[0]
+             + ' in post #<a href="https://what.thedailywtf.com/t/'
+             + command.post.topic_id + '/' + command.post.post_number + '">'
+             + command.post.post_number + '</a>.\n\n'
+             + 'Vote text:\n[quote]\n' + command.input + '\n[/quote]';
     internals.browser.createPost(command.post.topic_id, command.post.post_number, text, () => 0);
 };
 
@@ -97,6 +106,7 @@ exports.prepare = function prepare(plugConfig, config, events, browser) {
     internals.db = engine.Db(internals.configuration.db, {});
     events.onNotification('mentioned', exports.mentionHandler);
     events.onCommand('join', 'join current mafia game', exports.joinHandler, () => 0);
+    events.onCommand('for', 'vote for a player to be executed', exports.voteHandler, () => 0);
 };
 
 /**
